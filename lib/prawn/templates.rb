@@ -184,7 +184,7 @@ module Prawn
 
         if hash.trailer[:Encrypt]
           msg = "Template file is an encrypted PDF, it can't be used as a template"
-          raise PDF::Core::Errors::TemplateError, msg
+          raise ::PDF::Core::Errors::TemplateError, msg
         end
 
         if src_info
@@ -194,12 +194,12 @@ module Prawn
         if src_root
           @root = load_object_graph(hash, src_root).identifier
         end
-      rescue PDF::Reader::MalformedPDFError, PDF::Reader::InvalidObjectError => e
+      rescue ::PDF::Reader::MalformedPDFError, PDF::Reader::InvalidObjectError => e
         msg = "Error reading template file. If you are sure it's a valid PDF, it may be a bug.\n#{e.message}"
-        raise PDF::Core::Errors::TemplateError, msg
-      rescue PDF::Reader::UnsupportedFeatureError
+        raise ::PDF::Core::Errors::TemplateError, msg
+      rescue ::PDF::Reader::UnsupportedFeatureError
         msg = "Template file contains unsupported PDF features"
-        raise PDF::Core::Errors::TemplateError, msg
+        raise ::PDF::Core::Errors::TemplateError, msg
       end
 
       # recurse down an object graph from a source PDF, importing all the
@@ -216,7 +216,7 @@ module Prawn
           object
         when Array then
           object.map { |item| load_object_graph(hash, item)}
-        when PDF::Reader::Reference then
+        when ::PDF::Reader::Reference then
           unless @loaded_objects.has_key?(object.id)
             @loaded_objects[object.id] = ref(nil)
             new_obj = load_object_graph(hash, hash[object])
@@ -229,7 +229,7 @@ module Prawn
             end
           end
           @loaded_objects[object.id]
-        when PDF::Reader::Stream
+        when ::PDF::Reader::Stream
           # Stream is a subclass of string, so this is here to prevent the stream
           # being wrapped in a LiteralString
           object
@@ -243,7 +243,7 @@ module Prawn
   end
 end
 
-Prawn::Document::VALID_OPTIONS << :template
-Prawn::Document.extensions << Prawn::Templates
+::Prawn::Document::VALID_OPTIONS << :template
+::Prawn::Document.extensions << Prawn::Templates
 
-PDF::Core::ObjectStore.send(:include, Prawn::Templates::ObjectStoreExtensions)
+::PDF::Core::ObjectStore.send(:include, Prawn::Templates::ObjectStoreExtensions)
